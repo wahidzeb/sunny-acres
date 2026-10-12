@@ -319,7 +319,9 @@ var NP = GRID.cols * GRID.rows, START_PLOTS = 6;
 function plotCost(n) { return Math.round(40 * Math.pow(1.28, n - START_PLOTS)); }
 /* ---------- save ---------- */
 var S = { coins: 40, xp: 0, lvl: 1, inv: { wheat: 2 }, plots: [], pens: {}, blds: {}, orders: [], owned: START_PLOTS, cap: 60, snd: 1, mus: 1, speed: 1, tut: 0, ach: {}, stats: { harvest: 0, orders: 0 }, extra: { chicken: 0, cow: 0, sheep: 0 } };
-try { var _s = JSON.parse(localStorage.getItem(KEY)); if (_s) for (var k in _s) S[k] = _s[k]; } catch (e) {}
+// Save migration: deep-merge a loaded save onto the default schema. Keeps all progress, fills fields missing from older/partial saves, and ignores null or wrong-typed values.
+function zMerge(d, s) { if (Array.isArray(d)) { if (!Array.isArray(s)) return d; const n = Math.max(d.length, s.length), o = []; for (let i = 0; i < n; i++) { const dv = d[i], v = s[i]; o[i] = i >= d.length ? v : (v == null || (dv != null && typeof dv !== typeof v) || (typeof v === 'number' && !isFinite(v))) ? dv : (dv && typeof dv === 'object') ? zMerge(dv, v) : v; } return o; } if (!d || typeof d !== 'object') return s; if (!s || typeof s !== 'object' || Array.isArray(s)) return d; for (const k in s) { const v = s[k], dv = d[k]; if (v == null) continue; if (dv === undefined || dv === null) { d[k] = v; continue; } if (typeof dv !== typeof v || Array.isArray(dv) !== Array.isArray(v)) continue; if (typeof v === 'number' && !isFinite(v)) continue; d[k] = typeof v === 'object' ? zMerge(dv, v) : v; } return d; }
+try { var _s = JSON.parse(localStorage.getItem(KEY)); if (_s && typeof _s === 'object' && !Array.isArray(_s)) S = zMerge(S, _s); } catch (e) {}
 for (var i = 0; i < NP; i++) if (!S.plots[i]) S.plots[i] = { c: null, t0: 0 };
 PENS.forEach(function (p) { if (!S.pens[p.id]) S.pens[p.id] = { fed: 0, t0: 0 }; });
 BLDS.forEach(function (b) { if (!S.blds[b.id]) S.blds[b.id] = { job: null, t0: 0 }; });
