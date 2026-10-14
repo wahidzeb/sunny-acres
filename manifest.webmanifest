@@ -38,5 +38,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/sunny-acres/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Sunny Acres farm on a computer"
+    },
+    {
+      "src": "/sunny-acres/screenshot-narrow.png",
+      "sizes": "786x1704",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sunny Acres farm on a phone"
+    }
   ]
 }
